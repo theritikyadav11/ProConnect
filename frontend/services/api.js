@@ -8,32 +8,42 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+// Request interceptor to add the token to headers
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // ------------------- Auth -------------------
 export const registerUser = (data) => api.post("/register", data);
 export const loginUser = (data) => api.post("/login", data);
 
 // ------------------- Profile -------------------
-export const getUserProfile = (token) =>
-  api.post("/get_user_and_profile", { token });
+export const getUserProfile = () => api.post("/get_user_and_profile");
 
-export const updateUser = (data, token) =>
-  api.post("/user_update", { token, ...data });
+export const updateUser = (data) => api.post("/user_update", data);
 
-export const updateProfile = (data, token) =>
-  api.post("/update_profile_data", { token, ...data });
+export const updateProfile = (data) => api.post("/update_profile_data", data);
 
-export const updateProfilePicture = (formData, token) => {
-  formData.append("token", token);
+export const updateProfilePicture = (formData) => {
   return api.post("/update_profile_picture", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
 
-export const updateProfileSkills = (data, token) =>
-  api.post("/profile/update_skills", { token, ...data });
+export const updateProfileSkills = (data) =>
+  api.post("/profile/update_skills", data);
 
-export const updateProfileInterests = (data, token) =>
-  api.post("/profile/update_interests", { token, ...data });
+export const updateProfileInterests = (data) =>
+  api.post("/profile/update_interests", data);
 
 export const getAllUsers = () => api.get("/user/get_all_users");
 
@@ -41,51 +51,30 @@ export const downloadResume = (id) =>
   api.get(`/user/download_resume?id=${id}`, { responseType: "blob" });
 
 // ------------------- Connections -------------------
-export const sendConnectionRequest = (data, token) =>
-  api.post("/user/send_connection_request", { token, ...data });
+export const sendConnectionRequest = (data) =>
+  api.post("/user/send_connection_request", data);
 
-export const getConnectionStatusByUserId = (userId, token) =>
-  api.get(`/user/connection_status/${userId}`, { params: { token } });
+export const getConnectionStatusByUserId = (userId) =>
+  api.get(`/user/connection_status/${userId}`);
 
-// export const getConnectionsRequests = (token) =>
-//   api.get("/user/getConnectionsRequest", { params: { token } });
+export const getConnectionsRequests = () =>
+  api.get("/user/getConnectionsRequest");
 
-// export const getIncomingRequests = (token) =>
-//   api.get("/user/user_connection_request", { params: { token } });
-
-// export const acceptConnectionRequest = (data, token) =>
-//   api.post("/user/accept_connection_request", { token, ...data });
-
-export const getConnectionsRequests = (token) =>
-  api.get("/user/getConnectionsRequest", { params: { token } });
-
-export const getMyConnections = (token) =>
-  api.get("/user/user_connection_request", { params: { token } });
+export const getMyConnections = () => api.get("/user/user_connection_request");
 
 export const acceptConnectionRequest = (data) =>
   api.post("/user/accept_connection_request", data);
 
 // Invitations (requests sent TO me)
-export const whatAreMyConnections = (token) =>
-  api.get("/user/user_connection_request", { params: { token } });
+export const whatAreMyConnections = () =>
+  api.get("/user/user_connection_request");
 
 // Accepted connections where I am either userId or connectionId
-export const getAcceptedConnections = (token) =>
-  api.get("/user/accepted_connections", { params: { token } });
-
-// export const acceptConnectionRequest = (data) =>
-//   api.post("/user/accept_connection_request", data);
+export const getAcceptedConnections = () =>
+  api.get("/user/accepted_connections");
 
 // ------------------- Posts -------------------
-// export const createPost = (formData, token) => {
-//   formData.append("token", token);
-//   return api.post("/post", formData, {
-//     headers: { "Content-Type": "multipart/form-data" },
-//   });
-// };
-
-export const createPost = (formData, token) => {
-  // token is already appended to formData in PostModal, no need to append again
+export const createPost = (formData) => {
   return api.post("/post", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
@@ -94,37 +83,82 @@ export const createPost = (formData, token) => {
 export const getProfessionalPosts = () => api.get("/posts/professional");
 export const getCommunityPosts = () => api.get("/posts/community");
 export const getAllPosts = () => api.get("/posts");
-export const getFeedPosts = (feedType, token) =>
+export const getFeedPosts = (feedType) =>
   api.get(`/posts/feed`, {
-    params: { type: feedType, token },
+    params: { type: feedType },
   });
 
-export const deletePost = (data, token) =>
-  api.post("/delete_post", { token, ...data });
+export const deletePost = (data) => api.post("/delete_post", data);
 
-export const commentOnPost = (data, token) =>
-  api.post("/comment", { token, ...data });
+export const commentOnPost = (data) => api.post("/comment", data);
 
 export const getCommentsByPost = (post_id) =>
   api.get("/get_comments", { params: { post_id } });
 
-export const deleteComment = (data, token) =>
-  api.delete("/delete_comment", { data: { token, ...data } });
+export const deleteComment = (data) =>
+  api.delete("/delete_comment", { data: { ...data } });
 
 export const incrementLikes = (post_id) =>
   api.post("/increment_post_like", { post_id });
 
-export const getPostsByUser = (token) =>
-  api.get("/posts/user", { params: { token } });
+export const getPostsByUser = () => api.get("/posts/user");
 
-export const getUserProfileById = (userId, token) =>
-  api.get(`/profile/${userId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getUserProfileById = (userId) => api.get(`/profile/${userId}`);
 
-export const getPostsByUserId = (userId, token) =>
-  api.get(`/posts/user/${userId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getPostsByUserId = (userId) => api.get(`/posts/user/${userId}`);
+
+// ------------------- Micro Projects -------------------
+export const createMicroProject = (data) =>
+  api.post("/api/microprojects", data);
+
+export const getMicroProject = (projectId) =>
+  api.get(`/api/microprojects/${projectId}`);
+
+export const updateMicroProject = (projectId, data) =>
+  api.put(`/api/microprojects/${projectId}`, data);
+
+export const inviteCollaborator = (projectId, collaboratorId) =>
+  api.post(`/api/microprojects/${projectId}/invite`, { collaboratorId });
+
+export const acceptCollaboration = (projectId) =>
+  api.post(`/api/microprojects/${projectId}/accept`, {});
+
+export const declineCollaboration = (projectId) =>
+  api.post(`/api/microprojects/${projectId}/decline`, {});
+
+export const addTaskToProject = (projectId, data) =>
+  api.post(`/api/microprojects/${projectId}/tasks`, data);
+
+export const updateProjectTask = (taskId, data) =>
+  api.put(`/api/microprojects/tasks/${taskId}`, data);
+
+export const completeMicroProject = (projectId) =>
+  api.post(`/api/microprojects/${projectId}/complete`, {});
+
+export const getMicroProjectsByUser = (userId, statusFilter = null) => {
+  let url = `/api/microprojects/user/${userId}`;
+  if (statusFilter) {
+    url += `?status=${statusFilter}`;
+  }
+  return api.get(url);
+};
+
+export const getAchievementsByUser = (userId) =>
+  api.get(`/api/microprojects/user/${userId}/achievements`);
+
+// ------------------- Notifications -------------------
+export const getNotifications = (userId) =>
+  api.get(`/api/notifications/${userId}`);
+
+export const markNotificationAsRead = (notificationId) =>
+  api.put(`/api/notifications/${notificationId}/read`, {});
+
+// ------------------- Project Chat (Placeholder) -------------------
+// These endpoints need to be implemented on the backend
+export const getProjectDiscussion = (projectId) =>
+  api.get(`/api/microprojects/${projectId}/discussion`);
+
+export const sendProjectMessage = (projectId, data) =>
+  api.post(`/api/microprojects/${projectId}/discussion`, data);
 
 export default api;

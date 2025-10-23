@@ -6,11 +6,14 @@ import {
   getPostsByUser,
   deletePost,
   downloadResume,
+  getMicroProjectsByUser,
+  getAchievementsByUser,
 } from "../services/api";
 import PostCard from "../components/Feed/PostCard";
 import ProfileEditModal from "../components/Profile/ProfileEditModal";
 import SkillsSection from "../components/Profile/SkillsSection";
 import InterestsSection from "../components/Profile/InterestsSection";
+import MicroProjectList from "../components/MicroProject/MicroProjectList";
 
 export default function Profile() {
   const [auth] = useRecoilState(authAtom);
@@ -20,6 +23,10 @@ export default function Profile() {
   const [postsLoading, setPostsLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editTab, setEditTab] = useState("profile");
+  const [userMicroProjects, setUserMicroProjects] = useState([]);
+  const [userAchievements, setUserAchievements] = useState([]);
+  const [microProjectsLoading, setMicroProjectsLoading] = useState(true);
+  const [achievementsLoading, setAchievementsLoading] = useState(true);
 
   const fetchProfile = async () => {
     if (auth.token) {
@@ -35,11 +42,37 @@ export default function Profile() {
     }
   };
 
+  const fetchUserMicroProjects = async (userId) => {
+    setMicroProjectsLoading(true);
+    try {
+      const response = await getMicroProjectsByUser(userId);
+      setUserMicroProjects(response.data);
+    } catch (error) {
+      console.error("Failed to fetch user micro projects", error);
+      setUserMicroProjects([]);
+    } finally {
+      setMicroProjectsLoading(false);
+    }
+  };
+
+  const fetchUserAchievements = async (userId) => {
+    setAchievementsLoading(true);
+    try {
+      const response = await getAchievementsByUser(userId);
+      setUserAchievements(response.data);
+    } catch (error) {
+      console.error("Failed to fetch user achievements", error);
+      setUserAchievements([]);
+    } finally {
+      setAchievementsLoading(false);
+    }
+  };
+
   const fetchUserPosts = async () => {
     if (auth.token) {
       setPostsLoading(true);
       try {
-        const res = await getPostsByUser(auth.token);
+        const res = await getPostsByUser();
         setUserPosts(res.data.posts || []);
       } catch (error) {
         setUserPosts([]);
@@ -77,6 +110,13 @@ export default function Profile() {
     fetchProfile();
     fetchUserPosts();
   }, [auth.token]);
+
+  useEffect(() => {
+    if (profile?.userId?._id) {
+      fetchUserMicroProjects(profile.userId._id);
+      fetchUserAchievements(profile.userId._id);
+    }
+  }, [profile?.userId?._id, auth.token]);
 
   if (loading)
     return <div className="p-6 text-gray-500">Loading profile...</div>;
@@ -172,6 +212,32 @@ export default function Profile() {
 
         {/* Interests */}
         <InterestsSection interests={profile.interests} />
+      </div>
+
+      {/* --- Micro Projects --- */}
+      <div className="mt-8">
+        {microProjectsLoading ? (
+          <div className="p-6 text-gray-500">Loading micro projects...</div>
+        ) : (
+          <MicroProjectList
+            title="My Micro Projects"
+            projects={userMicroProjects}
+            isAchievementList={false}
+          />
+        )}
+      </div>
+
+      {/* --- Achievements --- */}
+      <div className="mt-8">
+        {achievementsLoading ? (
+          <div className="p-6 text-gray-500">Loading achievements...</div>
+        ) : (
+          <MicroProjectList
+            title="My Achievements"
+            projects={userAchievements}
+            isAchievementList={true}
+          />
+        )}
       </div>
 
       {/* --- All Posts --- */}

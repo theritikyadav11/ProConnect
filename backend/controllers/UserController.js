@@ -4,19 +4,23 @@ import Connection from "../models/Connection.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import PDFDocument from "pdfkit";
+import jwt from "jsonwebtoken"; // Import jsonwebtoken
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { calculateTrustScore } from "../services/trustScoreService.js";
 import Post from "../models/Post.js";
+import FeedScore from "../models/FeedScore.js"; // Import FeedScore model
 import { computeFeedScoresForPost } from "../services/feedService.js";
 import cloudinary from "../services/cloudinary.js";
+import axios from "axios"; // Import axios for fetching images
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const convertUserDataToPDF = async (userData) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    // Mark the callback as async
     const doc = new PDFDocument();
     const outputPath = crypto.randomBytes(16).toString("hex") + ".pdf";
     const filePath = path.resolve(__dirname, "../uploads", outputPath);
@@ -32,11 +36,19 @@ const convertUserDataToPDF = async (userData) => {
     // Add user profile picture if available
     if (userData.userId.profilePicture) {
       const profilePictureUrl = userData.userId.profilePicture;
-      // Assume it's a Cloudinary URL
-      doc.image(profilePictureUrl, {
-        align: "center",
-        width: 100,
-      });
+      try {
+        const response = await axios.get(profilePictureUrl, {
+          responseType: "arraybuffer",
+        });
+        const imageBuffer = Buffer.from(response.data, "binary");
+        doc.image(imageBuffer, {
+          align: "center",
+          width: 100,
+        });
+      } catch (imageError) {
+        console.error("Failed to fetch profile picture for PDF:", imageError);
+        // Continue without image if fetching fails
+      }
     }
 
     doc.fontSize(14).text(`Name: ${userData.userId.name}`);
@@ -108,19 +120,30 @@ export const loginUser = async (req, res) => {
     if (!isMatch)
       return res.status(404).json({ message: "Invalid Credentials" });
 
-    const token = crypto.randomBytes(32).toString("hex");
-    await User.updateOne({ _id: user._id }, { token });
+    // Generate JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h", // Token expires in 1 hour
+    });
+
+    // Optionally, save the token to the user model if needed for session management,
+    // but for stateless JWTs, it's often not stored in DB.
+    // For now, we'll just return it.
+    // await User.updateOne({ _id: user._id }, { token });
+
     return res.status(200).json({ token: token });
   } catch (error) {
+    console.error("Login error:", error);
     return res.status(500).json({ message: "Error occured" });
   }
 };
 
 export const updateProfilePicture = async (req, res) => {
-  const { token } = req.body;
   try {
-    const user = await User.findOne({ token: token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
@@ -147,10 +170,12 @@ export const updateProfilePicture = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
   try {
-    const { token, ...newUserData } = req.body;
-
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const { ...newUserData } = req.body; // Removed token from req.body
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     const { uname, email } = newUserData;
     const existingUser = await User.findOne({ $or: [{ uname }, { email }] });
@@ -171,25 +196,33 @@ export const updateUserProfile = async (req, res) => {
 
 export const getUserAndProfile = async (req, res) => {
   try {
-    const { token } = req.body;
-    const user = await User.findOne({ token: token });
+    // User is already attached to req by the protect middleware
+    const user = req.user;
     if (!user) return res.status(400).json({ message: "User not found" });
+
     const userProfile = await Profile.findOne({ userId: user._id }).populate(
       "userId",
       "name email uname profilePicture"
     );
+    if (!userProfile)
+      return res.status(404).json({ message: "Profile not found" });
+
     return res.status(200).json(userProfile);
   } catch (error) {
+    console.error("getUserAndProfile error:", error);
     return res.status(500).json({ message: error.message });
   }
 };
 
 export const updateProfileData = async (req, res) => {
   try {
-    const { token, ...newProfileData } = req.body;
+    const { ...newProfileData } = req.body; // token is no longer expected in body
 
-    const user = await User.findOne({ token: token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     const profile_to_update = await Profile.findOne({ userId: user._id });
     if (!profile_to_update)
@@ -247,10 +280,13 @@ export const downloadProfile = async (req, res) => {
 export const sendConnectionRequest = async (req, res) => {
   console.log("Received connection request:", req.body);
 
-  const { token, connectionId, purpose } = req.body;
+  const { connectionId, purpose } = req.body; // Removed token from req.body
   try {
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     const connectionUser = await User.findById(connectionId);
     if (!connectionUser)
@@ -279,10 +315,12 @@ export const sendConnectionRequest = async (req, res) => {
 };
 
 export const getMyConnectionsRequest = async (req, res) => {
-  const { token } = req.query;
   try {
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     const connections = await Connection.find({ userId: user._id })
       .populate("connectionId", "name uname email profilePicture")
@@ -295,10 +333,12 @@ export const getMyConnectionsRequest = async (req, res) => {
 };
 
 export const whatAreMyConnections = async (req, res) => {
-  const { token } = req.query;
   try {
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     // Find pending (not yet accepted or rejected) connection requests sent TO current user
     const connections = await Connection.find({
@@ -313,10 +353,13 @@ export const whatAreMyConnections = async (req, res) => {
 };
 
 export const acceptConnectionRequest = async (req, res) => {
-  const { token, requestId, action_type } = req.body;
+  const { requestId, action_type } = req.body; // Removed token from req.body
   try {
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     const connection = await Connection.findOne({
       _id: requestId,
@@ -358,12 +401,13 @@ export const getProfileByUserId = async (req, res) => {
 // Get connection status between logged-in user and target userId
 export const getConnectionStatusByUserId = async (req, res) => {
   try {
-    const { token } = req.query; // Auth token of current user
+    const currentUser = req.user; // User is already attached by the protect middleware
     const { userId } = req.params; // Target user profile id
 
-    const currentUser = await User.findOne({ token });
     if (!currentUser)
-      return res.status(400).json({ message: "User not found" });
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     const connectionUser = await User.findById(userId);
     if (!connectionUser)
@@ -388,10 +432,12 @@ export const getConnectionStatusByUserId = async (req, res) => {
 };
 
 export const getAcceptedConnections = async (req, res) => {
-  const { token } = req.query;
   try {
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
 
     const connections = await Connection.find({
       status_accepted: true,
@@ -423,9 +469,12 @@ export const getAcceptedConnections = async (req, res) => {
 
 export const updateProfileSkills = async (req, res) => {
   try {
-    const { token, skills } = req.body;
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const { skills } = req.body; // Removed token from req.body
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
     const profile = await Profile.findOne({ userId: user._id });
     if (!profile) return res.status(404).json({ message: "Profile not found" });
     profile.skills = Array.isArray(skills) ? skills : [];
@@ -468,9 +517,12 @@ export const updateProfileSkills = async (req, res) => {
 
 export const updateProfileInterests = async (req, res) => {
   try {
-    const { token, interests } = req.body;
-    const user = await User.findOne({ token });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const { interests } = req.body; // Removed token from req.body
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
     const profile = await Profile.findOne({ userId: user._id });
     if (!profile) return res.status(404).json({ message: "Profile not found" });
     profile.interests = Array.isArray(interests) ? interests : [];

@@ -47,15 +47,16 @@ import cloudinary from "../services/cloudinary.js";
 
 export const createPost = async (req, res) => {
   try {
-    const { body } = req.body;
-
-    // Validate user using token
-    const user = await User.findOne({ token: req.body.token });
+    // The user is already validated and attached to req.user by the protect middleware
+    const user = req.user;
     if (!user) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not found after authentication" });
     }
 
-    // Create new post (supports uploaded file or base64 media)
+    const { body } = req.body;
+
     let mediaUrl = req.body.media || "";
     let fileType = req.body.fileType || "";
 
@@ -75,7 +76,7 @@ export const createPost = async (req, res) => {
 
     const newPost = new Post({
       userId: user._id,
-      body: req.body.body || "",
+      body: body || "",
       media: mediaUrl,
       fileType: fileType,
     });
@@ -114,14 +115,13 @@ export const getAllPosts = async (req, res) => {
 
 export const getFeed = async (req, res) => {
   try {
-    const { type, token } = req.query;
+    const { type } = req.query; // Removed token from req.query
+    const user = req.user; // User is already attached by the protect middleware
 
-    // Find user by token
-    const user = await User.findOne({ token });
     if (!user) {
       return res
         .status(401)
-        .json({ message: "User not found or unauthorized" });
+        .json({ message: "Not authorized, user not found" });
     }
 
     const PROFESSIONAL_THRESHOLD = parseInt(
@@ -169,10 +169,13 @@ export const getFeed = async (req, res) => {
 };
 
 export const deletePost = async (req, res) => {
-  const { token, post_id } = req.body;
+  const { post_id } = req.body;
   try {
-    const user = await User.findOne({ token }).select("_id");
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not found after authentication" });
 
     const post = await Post.findOne({ _id: post_id });
     if (!post) return res.status(400).json({ message: "Post not found" });
@@ -214,13 +217,14 @@ export const deletePost = async (req, res) => {
 // };
 
 export const commentPost = async (req, res) => {
-  const { token, post_id, commentBody } = req.body;
+  const { post_id, commentBody } = req.body;
   console.log("Request body: ", req.body);
   try {
-    const user = await User.findOne({ token }).select(
-      "_id name profilePicture"
-    );
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not found after authentication" });
 
     const post = await Post.findById(post_id);
     if (!post) return res.status(400).json({ message: "Post not found" });
@@ -285,10 +289,13 @@ export const get_comments_by_post = async (req, res) => {
 // };
 
 export const delete_comment_of_user = async (req, res) => {
-  const { token, comment_id } = req.body;
+  const { comment_id } = req.body;
   try {
-    const user = await User.findOne({ token }).select("_id");
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not found after authentication" });
 
     const comment = await Comment.findById(comment_id);
     if (!comment) return res.status(400).json({ message: "Comment not found" });
@@ -339,10 +346,13 @@ export const increment_likes = async (req, res) => {
 
 // Get posts by user token
 export const getPostsByUser = async (req, res) => {
-  const { token } = req.query;
   try {
-    const user = await User.findOne({ token }).select("_id");
-    if (!user) return res.status(400).json({ message: "User not found" });
+    const user = req.user; // User is already attached by the protect middleware
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
+    }
 
     const posts = await Post.find({ userId: user._id })
       .populate("userId", "name uname email profilePicture")

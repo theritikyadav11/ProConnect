@@ -8,6 +8,7 @@ import MyConnectionNavItem from "./MyConnectionNavItem";
 import DiscoverNavItem from "./DiscoverNavItem";
 import ProfileNavItem from "./ProfileNavItem";
 import SearchBar from "./SearchBar";
+import { FaPlusCircle } from "react-icons/fa";
 
 export default function Navbar() {
   const setAuth = useSetRecoilState(authAtom);
@@ -20,6 +21,7 @@ export default function Navbar() {
     "/my-connections": "MyConnections",
     "/discover": "Discover",
     "/profile": "Profile",
+    "/create-microproject": "CreateMicroProject", // Add new route
   };
 
   const [active, setActive] = useState(routeToTab[location.pathname] || "Home");
@@ -70,6 +72,20 @@ export default function Navbar() {
           active={active === "Profile"}
           onClick={() => handleNav("Profile", "/profile")}
         />
+        {/* New Micro Project Button */}
+        <button
+          onClick={() =>
+            handleNav("CreateMicroProject", "/create-microproject")
+          }
+          className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+            active === "CreateMicroProject"
+              ? "bg-blue-500 text-white"
+              : "text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          <FaPlusCircle className="mr-1" />
+          New Project
+        </button>
       </div>
 
       {/* Logout Button */}

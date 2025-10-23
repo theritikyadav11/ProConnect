@@ -34,6 +34,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  microProjects: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MicroProject",
+    },
+  ],
+  achievements: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MicroProject",
+    },
+  ],
 });
 
 const User = mongoose.model("User", userSchema);

@@ -29,7 +29,6 @@ export default function PostModal({ open, onClose, setPosts }) {
     if (!content.trim() && !media) return;
 
     const formData = new FormData();
-    formData.append("token", auth.token);
     formData.append("body", content || ""); // <-- always append a string
     if (media) {
       formData.append("media", media);
@@ -37,8 +36,9 @@ export default function PostModal({ open, onClose, setPosts }) {
     }
 
     setSubmitting(true);
+    console.log("Auth token before creating post:", auth.token); // Debugging line
     try {
-      await createPost(formData, auth.token);
+      await createPost(formData);
       // const res = await getFeedPosts();
       // setPosts(res.data.posts);
       onClose();
@@ -54,7 +54,7 @@ export default function PostModal({ open, onClose, setPosts }) {
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-10 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6 relative">
         {/* Close Button */}
         <button

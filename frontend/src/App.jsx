@@ -16,6 +16,10 @@ import ProfilePage from "../pages/Profile";
 import UserProfilePage from "../pages/UserProfile";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import CreateMicroProject from "../pages/CreateMicroProject";
+import MicroProjectDetail from "../pages/MicroProjectDetail";
+import EditMicroProject from "../pages/EditMicroProject";
+import AchievementDetail from "../pages/AchievementDetail"; // Import new component
 
 export default function App() {
   const auth = useRecoilValue(authAtom);
@@ -64,6 +68,11 @@ export default function App() {
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:userId" element={<UserProfilePage />} />
+          <Route path="/create-microproject" element={<CreateMicroProject />} />
+          <Route path="/microproject/:id" element={<MicroProjectDetail />} />
+          <Route path="/microproject/edit/:id" element={<EditMicroProject />} />
+          <Route path="/achievement/:id" element={<AchievementDetail />} />{" "}
+          {/* New route for achievements */}
           <Route path="*" element={<HomePage />} />
         </Routes>
       </div>

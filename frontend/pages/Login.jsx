@@ -39,7 +39,7 @@ export default function Login() {
 
       // fetch user profile (if backend supports it)
       try {
-        const profileRes = await getUserProfile();
+        const profileRes = await getUserProfile(); // Token is now handled by interceptor
         const user = profileRes.data?.user ?? profileRes.data;
         setAuth((prev) => ({ ...prev, user }));
       } catch (profileErr) {
