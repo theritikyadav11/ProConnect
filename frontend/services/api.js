@@ -161,4 +161,11 @@ export const getProjectDiscussion = (projectId) =>
 export const sendProjectMessage = (projectId, data) =>
   api.post(`/api/microprojects/${projectId}/discussion`, data);
 
+// ------------------- Jobs -------------------
+export const getJobs = () => api.get("/api/jobs");
+export const analyzeResume = (formData) =>
+  api.post("/api/jobs/analyze-resume", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
 export default api;

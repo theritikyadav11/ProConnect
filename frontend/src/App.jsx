@@ -11,8 +11,8 @@ import Navbar from "../components/Navbar/Navbar";
 // Page Components
 import HomePage from "../pages/Home";
 import MyConnectionsPage from "../pages/MyConnection";
-import DiscoverPage from "../pages/Discover";
 import ProfilePage from "../pages/Profile";
+import JobsPage from "../pages/Jobs"; // Import new Jobs page
 import UserProfilePage from "../pages/UserProfile";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -65,7 +65,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/my-connections" element={<MyConnectionsPage />} />
-          <Route path="/discover" element={<DiscoverPage />} />
+          <Route path="/jobs" element={<JobsPage />} />{" "}
+          {/* New route for Jobs */}
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:userId" element={<UserProfilePage />} />
           <Route path="/create-microproject" element={<CreateMicroProject />} />

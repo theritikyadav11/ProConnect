@@ -5,8 +5,8 @@ import { authAtom } from "../../state/authAtom";
 
 import HomeNavItem from "./HomeNavItem";
 import MyConnectionNavItem from "./MyConnectionNavItem";
-import DiscoverNavItem from "./DiscoverNavItem";
 import ProfileNavItem from "./ProfileNavItem";
+import JobsNavItem from "./JobsNavItem";
 import SearchBar from "./SearchBar";
 import { FaPlusCircle } from "react-icons/fa";
 
@@ -19,7 +19,7 @@ export default function Navbar() {
   const routeToTab = {
     "/": "Home",
     "/my-connections": "MyConnections",
-    "/discover": "Discover",
+    "/jobs": "Jobs",
     "/profile": "Profile",
     "/create-microproject": "CreateMicroProject", // Add new route
   };
@@ -64,9 +64,9 @@ export default function Navbar() {
           active={active === "MyConnections"}
           onClick={() => handleNav("MyConnections", "/my-connections")}
         />
-        <DiscoverNavItem
-          active={active === "Discover"}
-          onClick={() => handleNav("Discover", "/discover")}
+        <JobsNavItem
+          active={active === "Jobs"}
+          onClick={() => handleNav("Jobs", "/jobs")}
         />
         <ProfileNavItem
           active={active === "Profile"}

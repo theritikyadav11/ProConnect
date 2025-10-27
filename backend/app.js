@@ -13,18 +13,20 @@ import "./workers/feedWorkers.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import PostRoutes from "./routes/PostRoutes.js";
 import MicroProjectRoutes from "./routes/MicroProjectRoutes.js"; // Import new routes
+import JobRoutes from "./routes/JobRoutes.js"; // Import Job routes
 
 const app = express();
 
 //middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" })); // Increased limit for JSON payloads
+app.use(express.urlencoded({ extended: true, limit: "10mb" })); // Increased limit for URL-encoded payloads
 
 //routes
 app.use(UserRoutes);
 app.use(PostRoutes);
 app.use("/api/microprojects", MicroProjectRoutes); // Use new routes with a base path
+app.use("/api", JobRoutes); // Use Job routes with a base path
 
 async function start() {
   const mongoConnection = await mongoose.connect(process.env.MONGODB_URL);

@@ -11,6 +11,7 @@
   "author": "Ritik Yadav",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.27.0",
     "axios": "^1.12.2",
     "bcrypt": "^5.1.1",
     "cloudinary": "^1.41.3",
@@ -19,11 +20,16 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.11.0",
     "mongoose": "^8.13.2",
     "multer": "^1.4.5-lts.2",
     "node-cron": "^4.2.1",
     "nodemon": "^3.1.9",
     "pdf-creator-node": "^2.3.5",
+    "pdf-extract": "^1.0.11",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^2.4.5",
+    "pdf.js-extract": "^0.2.1",
     "pdfkit": "^0.17.0"
   }
 }
