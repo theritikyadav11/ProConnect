@@ -7,7 +7,6 @@ import HomeNavItem from "./HomeNavItem";
 import MyConnectionNavItem from "./MyConnectionNavItem";
 import ProfileNavItem from "./ProfileNavItem";
 import JobsNavItem from "./JobsNavItem";
-import SearchBar from "./SearchBar";
 import { FaPlusCircle } from "react-icons/fa";
 
 export default function Navbar() {
@@ -49,9 +48,6 @@ export default function Navbar() {
       {/* Logo & SearchBox */}
       <div className="flex items-center">
         <span className="font-bold text-xl text-blue-600 mr-4">ProConnect</span>
-        <span className="hidden md:block">
-          <SearchBar />
-        </span>
       </div>
 
       {/* Center Navigation Items */}
@@ -92,7 +88,7 @@ export default function Navbar() {
       <div>
         <button
           onClick={handleLogout}
-          className="ml-4 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+          className="ml-4 px-4 py-2 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
         >
           Signout
         </button>

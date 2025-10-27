@@ -23,25 +23,38 @@ export default function ProfileSection() {
   if (!profile) return <div>Loading...</div>;
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-4 flex flex-col items-center">
+    <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg p-6 flex flex-col items-center text-white transform transition-all duration-300 hover:scale-105">
       <img
         src={profile.userId.profilePicture || "default.jpg"}
         alt="Profile"
-        className="w-24 h-24 rounded-full mb-3 object-cover border-2 border-blue-600"
+        className="w-28 h-28 rounded-full mb-4 object-cover border-4 border-white shadow-md"
       />
-      <h2 className="text-xl font-bold mb-1">{profile.userId.name}</h2>
-      {/* <p className="text-gray-500 text-sm mb-2">
-        {profile.currentPost || "No current position set"}
-      </p> */}
-      <p className="text-xs text-gray-400 text-center mb-3">
+      <h2 className="text-2xl font-extrabold mb-1 text-shadow-sm">
+        {profile.userId.name}
+      </h2>
+      <p className="text-sm opacity-90 text-center mb-4">
         {profile.bio || "No bio available"}
       </p>
-      <button
-        className="mt-4 px-4 py-1 rounded-full bg-blue-600 text-white text-xs hover:bg-blue-700"
-        onClick={() => navigate("/profile")} // redirect on click
-      >
-        Edit Profile
-      </button>
+      <div className="flex flex-col space-y-3 w-full px-4">
+        <button
+          className="w-full py-2 rounded-full bg-white text-blue-600 font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-md"
+          onClick={() => navigate("/profile")}
+        >
+          Edit Profile
+        </button>
+        <button
+          className="w-full py-2 rounded-full bg-white text-blue-600 font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-md"
+          onClick={() => navigate("/jobs")}
+        >
+          Jobs Section
+        </button>
+        <button
+          className="w-full py-2 rounded-full bg-white text-blue-600 font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-md"
+          onClick={() => navigate("/create-microproject")}
+        >
+          Micro-Project Section
+        </button>
+      </div>
     </div>
   );
 }

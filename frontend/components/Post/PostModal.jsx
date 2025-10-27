@@ -54,7 +54,7 @@ export default function PostModal({ open, onClose, setPosts }) {
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-10 backdrop-blur-sm">
+    <div className="fixed inset-0 z-40 flex items-center justify-center backdrop-blur-lg">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-xl p-6 relative">
         {/* Close Button */}
         <button

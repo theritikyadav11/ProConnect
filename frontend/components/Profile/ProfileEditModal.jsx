@@ -17,77 +17,88 @@ export default function ProfileEditModal({
   return (
     <div>
       {/* Blurred overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-20 backdrop-blur-sm z-40"></div>
+      <div className="fixed inset-0 backdrop-blur-lg bg-opacity-0 z-40"></div>
 
       {/* Modal content */}
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div className="bg-white rounded-md w-[600px] p-6 shadow-lg max-h-[80vh] overflow-auto relative z-50">
-          {/* --- Tabs --- */}
-          <div className="flex flex-wrap border-b mb-4 space-x-2">
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl h-[90vh] flex relative z-50 overflow-hidden">
+          {/* Close Button */}
+          <button
+            className="absolute right-4 top-4 text-2xl text-gray-400 hover:text-gray-600 z-10"
+            onClick={onClose}
+          >
+            &times;
+          </button>
+
+          {/* Sidebar for navigation */}
+          <div className="w-1/4 bg-gray-50 p-6 border-r border-gray-200 flex flex-col space-y-4">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">
+              Edit Options
+            </h3>
             <button
               onClick={() => setTab("profile")}
-              className={`flex-1 px-4 py-2 rounded-t ${
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 tab === "profile"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
               }`}
             >
-              Update Profile Details
+              Personal Details
             </button>
             <button
               onClick={() => setTab("photo")}
-              className={`flex-1 px-4 py-2 rounded-t ${
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 tab === "photo"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
               }`}
             >
-              Update Profile Photo
+              Profile Photo
             </button>
             <button
               onClick={() => setTab("education")}
-              className={`flex-1 px-4 py-2 rounded-t ${
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 tab === "education"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
               }`}
             >
-              Update Education Details
+              Education Details
             </button>
             <button
               onClick={() => setTab("work")}
-              className={`flex-1 px-4 py-2 rounded-t ${
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 tab === "work"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
               }`}
             >
-              Update Work Experience
+              Work Experience
             </button>
             <button
               onClick={() => setTab("skills")}
-              className={`flex-1 px-4 py-2 rounded-t ${
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 tab === "skills"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
               }`}
             >
-              Update Skills
+              Skills
             </button>
             <button
               onClick={() => setTab("interests")}
-              className={`flex-1 px-4 py-2 rounded-t ${
+              className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
                 tab === "interests"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-700"
               }`}
             >
-              Update Interests
+              Interests
             </button>
           </div>
 
-          {/* --- Tab Content --- */}
-          <div className="p-4">
+          {/* Content area */}
+          <div className="w-3/4 p-8 overflow-y-auto">
             {tab === "profile" && (
               <PersonalDetails
                 profile={profile}
@@ -135,15 +146,14 @@ export default function ProfileEditModal({
                 onProfileUpdated={onProfileUpdated}
               />
             )}
+            {/* --- Close Button --- */}
+            <button
+              onClick={onClose}
+              className="mt-8 px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded-lg font-semibold transition-colors duration-200"
+            >
+              Close
+            </button>
           </div>
-
-          {/* --- Close Button --- */}
-          <button
-            onClick={onClose}
-            className="mt-4 px-6 py-2 bg-gray-300 hover:bg-gray-400 rounded"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

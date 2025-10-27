@@ -1,26 +1,15 @@
-import { FaUser } from "react-icons/fa";
+import { User } from "lucide-react";
 
 export default function ProfileNavItem({ active, onClick }) {
   return (
     <button
-      className="flex flex-col items-center mx-3 focus:outline-none"
       onClick={onClick}
+      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+        active ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+      }`}
     >
-      <FaUser
-        className={`text-gray-700 ${
-          active ? "text-blue-600" : ""
-        } transition-all`}
-        size={22}
-      />
-      <span
-        className={`text-xs mt-1 hidden sm:block ${
-          active
-            ? "font-bold text-blue-600 border-b-2 border-black"
-            : "font-medium"
-        }`}
-      >
-        Profile
-      </span>
+      <User className="mr-1" size={18} />
+      Profile
     </button>
   );
 }

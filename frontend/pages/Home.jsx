@@ -1,7 +1,5 @@
 import ProfileSection from "../components/ProfileSection";
 import FeedContainer from "../components/Feed/FeedContainer";
-import MicroSection from "../components/MicroSection/MicroSection";
-
 export default function HomePage() {
   return (
     <div className="flex flex-col md:flex-row max-w-7xl mx-auto p-4 space-y-6 md:space-y-0 md:space-x-6">
@@ -11,13 +9,8 @@ export default function HomePage() {
       </div>
 
       {/* Feed Section */}
-      <div className="w-full md:w-1/2">
+      <div className="w-full md:w-3/4">
         <FeedContainer />
-      </div>
-
-      {/* Micro Section */}
-      <div className="w-full md:w-1/4">
-        <MicroSection />
       </div>
     </div>
   );

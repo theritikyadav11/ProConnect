@@ -168,18 +168,20 @@ export default function Profile() {
       </div>
 
       {/* --- Profile Details (Education, Work, Skills, Interests) --- */}
-      <div className="flex flex-wrap justify-center gap-8 md:gap-16 px-4">
+      <div className="flex flex-col sm:flex-row justify-center items-stretch gap-6 px-4">
         {/* Education */}
-        <div className="bg-gray-50 rounded-xl shadow border w-72 p-5 flex flex-col items-center">
-          <h3 className="font-bold text-lg mb-3">Education Details</h3>
+        <div className="flex-1 bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105 border border-gray-200">
+          <h3 className="font-bold text-xl text-gray-800 mb-4">Education</h3>
           {profile.education && profile.education.length > 0 ? (
-            <ul className="text-gray-700 text-base space-y-2">
+            <ul className="text-gray-700 text-base space-y-3 w-full">
               {profile.education.map((edu, idx) => (
-                <li key={idx} className="text-center">
-                  <span className="block font-medium">
+                <li key={idx} className="bg-gray-50 p-3 rounded-lg shadow-sm">
+                  <span className="block font-semibold text-blue-600">
                     {edu.degree} in {edu.fieldOfStudy}
                   </span>
-                  <span className="block">{edu.school}</span>
+                  <span className="block text-sm text-gray-500">
+                    {edu.school}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -189,16 +191,20 @@ export default function Profile() {
         </div>
 
         {/* Work Experience */}
-        <div className="bg-gray-50 rounded-xl shadow border w-72 p-5 flex flex-col items-center">
-          <h3 className="font-bold text-lg mb-3">Work Experience</h3>
+        <div className="flex-1 bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center transform transition-all duration-300 hover:scale-105 border border-gray-200">
+          <h3 className="font-bold text-xl text-gray-800 mb-4">
+            Work Experience
+          </h3>
           {profile.pastWork && profile.pastWork.length > 0 ? (
-            <ul className="text-gray-700 text-base space-y-2">
+            <ul className="text-gray-700 text-base space-y-3 w-full">
               {profile.pastWork.map((work, idx) => (
-                <li key={idx} className="text-center">
-                  <span className="block font-medium">
+                <li key={idx} className="bg-gray-50 p-3 rounded-lg shadow-sm">
+                  <span className="block font-semibold text-blue-600">
                     {work.position} at {work.company}
                   </span>
-                  <span className="block">{work.years} years</span>
+                  <span className="block text-sm text-gray-500">
+                    {work.years} years
+                  </span>
                 </li>
               ))}
             </ul>
@@ -208,10 +214,14 @@ export default function Profile() {
         </div>
 
         {/* Skills */}
-        <SkillsSection skills={profile.skills} />
+        <div className="flex-1">
+          <SkillsSection skills={profile.skills} />
+        </div>
 
         {/* Interests */}
-        <InterestsSection interests={profile.interests} />
+        <div className="flex-1">
+          <InterestsSection interests={profile.interests} />
+        </div>
       </div>
 
       {/* --- Micro Projects --- */}

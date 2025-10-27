@@ -1,24 +1,15 @@
-import { FaHome } from "react-icons/fa";
+import { Home } from "lucide-react";
 
 export default function HomeNavItem({ active, onClick }) {
   return (
     <button
-      className={`flex flex-col items-center mx-2 transition-all focus:outline-none`}
       onClick={onClick}
+      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+        active ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200"
+      }`}
     >
-      <FaHome
-        size={20}
-        className={active ? "text-blue-600" : "text-gray-700"}
-      />
-      <span
-        className={`text-xs mt-1 ${
-          active
-            ? "text-blue-600 font-bold border-b-2 border-black"
-            : "text-gray-700 font-medium"
-        } hidden sm:block`}
-      >
-        Home
-      </span>
+      <Home className="mr-1" size={18} />
+      Home
     </button>
   );
 }
