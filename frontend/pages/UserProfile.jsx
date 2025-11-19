@@ -11,14 +11,7 @@ import {
 } from "../services/api";
 import PostCard from "../components/Feed/PostCard";
 
-const PURPOSE_OPTIONS = [
-  "Networking",
-  "Job Inquiry",
-  "Collaboration",
-  "Mentorship",
-  "Freelance Opportunity",
-  "General",
-];
+const PURPOSE_OPTIONS = ["Networking", "Collaboration", "Mentorship"];
 
 export default function UserProfile() {
   const { userId } = useParams();
